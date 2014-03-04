@@ -37,7 +37,7 @@
 								.setApplicationCode(arguments.applicationCode)
 								.setSourceName(arguments.source)
 								.setSeverityCode(arguments.severityCode)
-								.setHostName(arguments.hostName)
+								.setHostName(getStrakerHostName(arguments.hostName))
 								.setExceptionMessage(arguments.exceptionMessage)
 								.setExceptionDetails(arguments.exceptionDetails)
 								.setCFID(arguments.cfid)
@@ -49,10 +49,36 @@
 
 			// validate Entry
 			bugLogListener.validate(rawEntry, arguments.APIKey);
-						
+
 			// log entry
 			bugLogListener.logEntry(rawEntry);
 		</cfscript>
 	</cffunction>
-	
+
+	<!--- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+
+	<cffunction name="getStrakerHostName" returntype="string" hint="Pass me an original hostname and I try and return server9 or server11 or something like that">
+		<cfargument name="hostname" type="string" required="true">
+		<cfscript>
+			var sReturn = arguments.hostname
+			var qReturn = ""
+			var iFind = 0
+
+			query name="qReturn" datasource="buglog"{
+				echo("	select * from st_hosts ");
+			}
+
+			loop query="qReturn"{
+				if (findNoCase(qReturn.label, arguments.hostName,1)){
+					sReturn = qReturn.hostname
+					break;
+				}
+			}
+			return sReturn;
+		</cfscript>
+	</cffunction>
+
+	<!--- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: --->
+
+
 </cfcomponent>
